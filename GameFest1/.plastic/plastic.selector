@@ -1,0 +1,4 @@
+repository "GameFest1@fahriyamin@cloud"
+  path "/"
+    br "/main"
+    co "/main"
