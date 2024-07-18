@@ -13,14 +13,12 @@ public class MouseClick : MonoBehaviour
     void OnMouseDown()
     {
         Vector3 mousePosition = Input.mousePosition;
-        Debug.Log("Mouse button clicked at (" + mousePosition.x + ", " + mousePosition.y + ")");
         OnMouseDownEvent.Invoke();
     }
 
     void OnMouseUp()
     {
         Vector3 mousePosition = Input.mousePosition;
-        Debug.Log("Mouse button released at (" + mousePosition.x + ", " + mousePosition.y + ")");
         OnMouseUpEvent.Invoke();
     }
 }

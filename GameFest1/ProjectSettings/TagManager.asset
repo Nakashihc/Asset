@@ -4,13 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Object3x3
   - Dinding
   - NPC
   - Spawner
-  - Object2x5
   - Bangunan
   - MoveSpot
+  - Habis
   layers:
   - Default
   - TransparentFX

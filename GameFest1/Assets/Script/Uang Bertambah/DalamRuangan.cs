@@ -7,20 +7,20 @@ public class DalamRuangan : MonoBehaviour
     public float delayTime = 3f; // time delay in seconds
     private bool isNPCInside = false; // flag to check if NPC is inside the trigger
     private float timer = 0f; // timer for the delay
-    public int upiahnambah;
+    public int upiahnambah = 10; // amount of upiah to add
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "NPC")
+        if (other.gameObject.CompareTag("NPC") && other.gameObject.layer == LayerMask.NameToLayer("NPC"))
         {
             isNPCInside = true;
             timer = 0f;
         }
     }
 
-    void OnTriggerExit(Collider other)
+    void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.tag == "NPC")
+        if (other.gameObject.CompareTag("NPC") && other.gameObject.layer == LayerMask.NameToLayer("NPC"))
         {
             isNPCInside = false;
         }
@@ -34,7 +34,8 @@ public class DalamRuangan : MonoBehaviour
             if (timer >= delayTime)
             {
                 AddUpiah();
-                isNPCInside = false;
+                isNPCInside = false; // reset flag to prevent multiple additions
+                timer = 0f; // reset timer
             }
         }
     }
@@ -43,5 +44,4 @@ public class DalamRuangan : MonoBehaviour
     {
         UpiahManager.instance.AddCoins(upiahnambah);
     }
-
 }
