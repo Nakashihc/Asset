@@ -198,10 +198,10 @@ GameObject:
   - component: {fileID: 3264086637192414672}
   - component: {fileID: -9202777782108072045}
   - component: {fileID: 4417362518959335791}
-  - component: {fileID: -4204744019565976635}
+  - component: {fileID: 7298441140445141439}
   m_Layer: 0
   m_Name: Bangunan1
-  m_TagString: MoveSpot
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -351,7 +351,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-4204744019565976635
+--- !u!114 &7298441140445141439
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -360,8 +360,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8768332317012034972}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32c0d08bdccb5a04399a40cb6f0ac531, type: 3}
+  m_Script: {fileID: 11500000, guid: 31aa929124ab78d40860f6e2c8337108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delayTime: 2
-  upiahnambah: 10
+  NPCsInTrigger: []

@@ -4,29 +4,36 @@ using UnityEngine;
 
 public class PatrolNPCRandom : MonoBehaviour
 {
+    [Header("Kecepatan NPC")]
     public float speed;
+
+    [Header("Waktu Menunggu NPC")]
     public float waitTime;
-    public float startWaitTime;
 
-    private NPCManager npcManager; // reference to the NPCManager script
-    private int currentSpotIndex; // current move spot index
-    private float timer; // timer for waiting at each spot
-    private float patrolTimer; // timer for total patrol time
+    private Jam jam;
+    private int currentSpotIndex;
+    private int currentDeadSpotIndex;
+    private float timer;
+    private float patrolTimer;
 
-    public float personalSpaceRadius = 1.0f;
-    private enum NPCState { Path1, Path2, RandomMove, ExitPath, MoveToDeadSpot }
+    // Script Sambungan
+    private NPCManager npcManager;
+
+    private enum NPCState { Path1, Path2, RandomMove, ExitPath1, ExitPath2, MoveToDeadSpot }
     private NPCState currentState;
 
+    [Header("Waktu NPC Bertahan dalam Museum")]
     public int waktuBertahan;
-    private int waktuacak;
     public int minimalwaktu;
+    private int waktuacak;
 
     void Start()
     {
-        npcManager = GameObject.FindObjectOfType<NPCManager>(); // find the NPCManager script
+        npcManager = GameObject.FindObjectOfType<NPCManager>();
+        jam = GameObject.FindObjectOfType<Jam>();
 
         currentState = NPCState.Path1;
-        timer = startWaitTime;
+        timer = waitTime;
         patrolTimer = 0;
 
         SetRandomReturnTime();
@@ -35,6 +42,14 @@ public class PatrolNPCRandom : MonoBehaviour
     void Update()
     {
         patrolTimer += Time.deltaTime;
+
+        if (jam.jam >= 16 && jam.menit >= 30)
+        {
+            if (currentState == NPCState.Path1 || currentState == NPCState.Path2 || currentState == NPCState.RandomMove)
+            {
+                currentState = NPCState.ExitPath1;
+            }
+        }
 
         switch (currentState)
         {
@@ -61,31 +76,38 @@ public class PatrolNPCRandom : MonoBehaviour
                     if (timer <= 0)
                     {
                         SetRandomDestination();
-                        timer = startWaitTime;
+                        timer = waitTime;
                     }
                 }
                 if (patrolTimer >= waktuacak)
                 {
-                    currentState = NPCState.ExitPath;
+                    currentState = NPCState.ExitPath1;
                 }
                 break;
-            case NPCState.ExitPath:
+            case NPCState.ExitPath1:
                 MoveTo(npcManager.keluarr.position);
                 if (Vector2.Distance(transform.position, npcManager.keluarr.position) < 0.2f)
                 {
+                    currentState = NPCState.ExitPath2;
+                }
+                break;
+            case NPCState.ExitPath2:
+                MoveTo(npcManager.keluarr2.position);
+                if (Vector2.Distance(transform.position, npcManager.keluarr2.position) < 0.2f)
+                {
                     currentState = NPCState.MoveToDeadSpot;
+                    SetRandomDeadSpot();
                 }
                 break;
             case NPCState.MoveToDeadSpot:
-                MoveTo(npcManager.deadSpot.position);
-                if (Vector2.Distance(transform.position, npcManager.deadSpot.position) < 0.2f)
+                MoveTo(npcManager.deadSpots[currentDeadSpotIndex].position);
+                if (Vector2.Distance(transform.position, npcManager.deadSpots[currentDeadSpotIndex].position) < 0.2f)
                 {
                     Destroy(gameObject);
                 }
                 break;
         }
 
-        // Check if NPC enters a layer mask to be destroyed
         if (IsInLayerMask())
         {
             Destroy(gameObject);
@@ -100,16 +122,20 @@ public class PatrolNPCRandom : MonoBehaviour
     void SetRandomDestination()
     {
         int newSpotIndex = Random.Range(0, npcManager.moveSpots.Length);
-        while (newSpotIndex == currentSpotIndex) // make sure it's a different spot
+        while (newSpotIndex == currentSpotIndex)
         {
             newSpotIndex = Random.Range(0, npcManager.moveSpots.Length);
         }
         currentSpotIndex = newSpotIndex;
     }
 
+    void SetRandomDeadSpot()
+    {
+        currentDeadSpotIndex = Random.Range(0, npcManager.deadSpots.Length);
+    }
+
     bool IsInLayerMask()
     {
-        // Check if the NPC is in the specific layer mask
         return (gameObject.layer == LayerMask.NameToLayer("Hilang"));
     }
 

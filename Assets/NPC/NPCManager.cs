@@ -5,22 +5,40 @@ using System.Linq;
 
 public class NPCManager : MonoBehaviour
 {
-    public GameObject npcPrefab; // the NPC prefab to spawn
-    public float spawnInterval = 5f; // spawn interval in seconds
-    public int maxNPCs = 5; // maximum number of NPCs to spawn
+    [Header ("Spawn Prefab")]
+    public GameObject npcPrefab;
+    public GameObject cewekPrefab;
 
-    private float nextSpawnTime; // next spawn time
-    private List<GameObject> npcs = new List<GameObject>(); // list of spawned NPCs
-    public Transform[] moveSpots; // move spots for the NPCs (using Tag "MoveSpot")
-    public Transform pathSpot1; // first special path spot
-    public Transform pathSpot2; // second special path spot
-    public Transform deadSpot; // second special path spot
+    public float spawnInterval = 5f;
+    public int maxNPCs = 5;
+
+    private float nextSpawnTime;
+    private List<GameObject> npcs = new List<GameObject>();
+
+    [Header ("Tempat Spawn")]
+    public Transform Spawn1;
+    public Transform Spawn2;
+
+    [Header ("Jalan Masuk")]
+    public Transform pathSpot1;
+    public Transform pathSpot2;
+
+    [Header ("Acak Lokasi Dalam Museum")]
+    public Transform[] moveSpots;
+
+    [Header ("Jalan Keluar")]
     public Transform keluarr;
+    public Transform keluarr2;
+
+    [Header ("Tempat Hilang")]
+    public Transform[] deadSpots;
+
+    private Jam jam;
 
     void Start()
     {
+        jam = GameObject.FindObjectOfType<Jam>();
         nextSpawnTime = Time.time + spawnInterval;
-        // Find all objects with the "MoveSpot" tag
         moveSpots = GameObject.FindObjectsOfType<Transform>().Where(t => t.CompareTag("MoveSpot")).ToArray();
     }
 
@@ -36,16 +54,10 @@ public class NPCManager : MonoBehaviour
 
     void SpawnNPC()
     {
-        // spawn the NPC at a random move spot
-        Transform randomMoveSpot = moveSpots[Random.Range(0, moveSpots.Length)];
-        GameObject npc = Instantiate(npcPrefab, transform.position, Quaternion.identity);
-        npcs.Add(npc);
-        UpdateNPCData(npc);
-    }
+        Transform randomSpawnSpot = Random.value > 0.5f ? Spawn1 : Spawn2;
+        GameObject prefabToSpawn = Random.value > 0.5f ? npcPrefab : cewekPrefab;
 
-    public void UpdateNPCData(GameObject npc)
-    {
-        // Set the tag of the NPC to "NPC"
-        npc.tag = "NPC";
+        GameObject npc = Instantiate(prefabToSpawn, randomSpawnSpot.position, Quaternion.identity);
+        npcs.Add(npc);
     }
 }

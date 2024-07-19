@@ -4,29 +4,81 @@ using UnityEngine.UI;
 
 public class Objectplacer : MonoBehaviour
 {
-    // The 2D object that will trigger the script
+    [Header ("Object Taruh")]
     public GameObject object2D;
 
-    // The object prefabs to be placed
-    public GameObject prefab1;
-    public GameObject prefab2;
-    public GameObject prefab3;    
+    [Header ("Bangunan diBangun")]
+    public GameObject bangunan1;
+    public GameObject bangunan2;
+    public GameObject bangunan3;
 
-    public void PlacePrefab1()
+    [Header("Harga Bangunan")]
+    public int Harga1;
+    public int Harga2;
+    public int Harga3;
+
+    private UpiahManager upiahManager;
+    private XPSystem xpSystem;
+
+    void Start()
     {
-        // Instantiate prefab 1 at the position of the 2D object
-        Instantiate(prefab1, object2D.transform.position, Quaternion.identity);
+        upiahManager = GameObject.FindObjectOfType<UpiahManager>();
+        xpSystem = GameObject.FindObjectOfType<XPSystem>();
     }
 
-    public void PlacePrefab2()
+    public void Taruhbangunan1()
     {
-        // Instantiate prefab 2 at the position of the 2D object
-        Instantiate(prefab2, object2D.transform.position, Quaternion.identity);
+        if (upiahManager.totalUpiah <= Harga3)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+        }
+        else if (xpSystem.Level <= 0)
+        {
+            Debug.Log("Level Tidak Cukup");
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga1);
+            Instantiate(bangunan1, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+        }
     }
 
-    public void PlacePrefab3()
+    public void Taruhbangunan2()
     {
-        // Instantiate prefab 3 at the position of the 2D object
-        Instantiate(prefab3, object2D.transform.position, Quaternion.identity);
+        if (upiahManager.totalUpiah <= Harga2)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+        }
+        else if (xpSystem.Level <= 0)
+        {
+            Debug.Log("Level Tidak Cukup");
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga2);
+            Instantiate(bangunan2, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+        }
+
+    }
+
+    public void Taruhbangunan3()
+    {
+        if (upiahManager.totalUpiah <= Harga3)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+        }
+        else if (xpSystem.Level <= 0)
+        {
+            Debug.Log("Level Tidak Cukup");
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga3);
+            Instantiate(bangunan3, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+        }
+
     }
 }
