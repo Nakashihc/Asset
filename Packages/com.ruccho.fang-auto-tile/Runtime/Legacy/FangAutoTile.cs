@@ -197,7 +197,7 @@ namespace Ruccho.Utilities
             serializedObject.ApplyModifiedProperties();
         }
 
-        public override Texture2D RenderStaticPreview
+        /*public override Texture2D RenderStaticPreview
     (
         string assetPath,
         UnityEngine.Object[] subAssets,
@@ -213,7 +213,7 @@ namespace Ruccho.Utilities
                 return f;
             }
             return base.RenderStaticPreview(assetPath, subAssets, width, height);
-        }
+        }*/
         private void GenerateTileInfoMessage(int tileSize, int frameCount, int texSize)
         {
             StringBuilder sb = new StringBuilder();
@@ -689,7 +689,7 @@ namespace Ruccho.Utilities
         }
     }
 
-    [CustomPreview(typeof(FangAutoTile))]
+    /*[CustomPreview(typeof(FangAutoTile))]
     public class FangAutoTilePreview : ObjectPreview
     {
         private GUIContent previewTitle = new GUIContent("Tiles");
@@ -724,7 +724,7 @@ namespace Ruccho.Utilities
             if (previewTexture)
                 EditorGUI.DrawTextureTransparent(r, previewTexture);
         }
-    }
+    }*/
     [CustomPreview(typeof(FangAutoTile))]
     public class FangAutoTileTexturePreview : ObjectPreview
     {

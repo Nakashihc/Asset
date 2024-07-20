@@ -23,8 +23,6 @@ namespace Ruccho.Fang
         public override Texture2D RenderStaticPreview(string assetPath, Object[] subAssets, int width, int height)
         {
             var compiledChannelsProp = serializedObject.FindProperty("compiledChannels");
-            if (compiledChannelsProp.arraySize == 0) return base.RenderStaticPreview(assetPath, subAssets, width, height);
-            
             var channelProp = compiledChannelsProp.GetArrayElementAtIndex(0);
             
             if (channelProp != null)
@@ -107,14 +105,14 @@ namespace Ruccho.Fang
                     var mainChannel =
                         e.serializedObject.FindProperty(FangAutoTileEditor.p_MainChannel)
                             .objectReferenceValue as Texture2D;
-                    segments.AddRange(e.GetSegments(enablePadding)
+                    segments.AddRange(e.GetSegments()
                         .Select(s => new TileDrawingItem(s, new TemporaryTexture2DBuffer(mainChannel))));
                 }
 
                 var segmentsOrdered = segments.OrderByDescending(s => s.Segment.Width * s.Segment.Height);
 
                 int texSize =
-                    FangAutoTileEditor.GetSuitableTextureSize(segmentsOrdered.Select(s => s.Segment));
+                    FangAutoTileEditor.GetSuitableTextureSize(segmentsOrdered.Select(s => s.Segment), enablePadding);
 
                 //Validate textures
                 for (int i = 0; i < Mathf.Max(wholeChannels, compiledChannelsProp.arraySize); i++)
@@ -143,13 +141,13 @@ namespace Ruccho.Fang
                         {
                             if (tex.width != texSize || tex.height != texSize || tex.graphicsFormat != format)
                             {
-                                tex.Reinitialize(texSize, texSize, format, false);
+                                tex.Resize(texSize, texSize, format, false);
                             }
                         }
                         else
                         {
                             tex = new Texture2D(texSize, texSize, DefaultFormat.LDR, TextureCreationFlags.None);
-                            tex.Reinitialize(texSize, texSize, format, false);
+                            tex.Resize(texSize, texSize, format, false);
                             tex.name = "Texture";
                             AssetDatabase.AddObjectToAsset(tex, target);
                             element.objectReferenceValue = tex;
@@ -162,7 +160,7 @@ namespace Ruccho.Fang
 
 
                 var dest = compiledChannelsProp.GetArrayElementAtIndex(0).objectReferenceValue as Texture2D;
-                FangAutoTileEditor.GenerateTilesForTexture(dest, segmentsOrdered, true);
+                FangAutoTileEditor.GenerateTilesForTexture(dest, segmentsOrdered, enablePadding, true);
             }
 
             //sub channels
@@ -175,28 +173,28 @@ namespace Ruccho.Fang
                     var subChannel =
                         e.serializedObject.FindProperty(FangAutoTileEditor.p_SubChannels).GetArrayElementAtIndex(i - 1)
                             .objectReferenceValue as Texture2D;
-                    segments.AddRange(e.GetSegments(enablePadding)
+                    segments.AddRange(e.GetSegments()
                         .Select(s => new TileDrawingItem(s, new TemporaryTexture2DBuffer(subChannel))));
                 }
 
                 var segmentsOrdered = segments.OrderByDescending(s => s.Segment.Width * s.Segment.Height);
 
                 var dest = compiledChannelsProp.GetArrayElementAtIndex(i).objectReferenceValue as Texture2D;
-                FangAutoTileEditor.GenerateTilesForTexture(dest, segmentsOrdered, false);
+                FangAutoTileEditor.GenerateTilesForTexture(dest, segmentsOrdered, enablePadding, false);
             }
-            
-            serializedObject.ApplyModifiedProperties();
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             foreach (var e in editors)
             {
-                e.serializedObject.ApplyModifiedProperties();
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(e.target));
+                e.serializedObject.ApplyModifiedProperties();
             }
 
             AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(target));
+            
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

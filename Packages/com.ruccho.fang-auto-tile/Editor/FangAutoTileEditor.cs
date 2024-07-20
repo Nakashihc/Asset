@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
 
 namespace Ruccho.Fang
@@ -16,20 +14,15 @@ namespace Ruccho.Fang
     {
         public static readonly string p_EnablePadding = "enablePadding";
         public static readonly string p_OneTilePerUnit = "oneTilePerUnit";
-        public static readonly string p_PhysicsShapeGeneration = "physicsShapeGeneration";
         public static readonly string p_PixelsPerUnit = "pixelsPerUnit";
         public static readonly string p_WrapMode = "wrapMode";
         public static readonly string p_FilterMode = "filterMode";
         public static readonly string p_MainChannel = "mainChannel";
-        public static readonly string p_NumSlopes = "numSlopes";
         public static readonly string p_SubChannels = "subChannels";
-
-        public static readonly string p_FrameMode = "frameMode";
         public static readonly string p_AnimationMinSpeed = "animationMinSpeed";
         public static readonly string p_AnimationMaxSpeed = "animationMaxSpeed";
         public static readonly string p_AnimationStartTime = "animationStartTime";
         public static readonly string p_ColliderType = "colliderType";
-        public static readonly string p_IsSlope = "isSlope";
         public static readonly string p_ConnectableTiles = "connectableTiles";
 
 
@@ -40,18 +33,6 @@ namespace Ruccho.Fang
 
         public static readonly string p_TC_CombinationId = "combinationId";
         public static readonly string p_TC_Frames = "frames";
-
-        public static readonly string p_SlopeDefinition = "slopeDefinition";
-        public static readonly string p_SD_Sizes = "sizes";
-        public static readonly string p_STSD_FloorUp = "floorUp";
-        public static readonly string p_STSD_FloorDown = "floorDown";
-        public static readonly string p_STSD_CeilUp = "ceilUp";
-        public static readonly string p_STSD_CeilDown = "ceilDown";
-        public static readonly string p_STAD_HorizontalTiles = "horizontalTiles";
-        public static readonly string p_STAD_VerticalTiles = "verticalTiles";
-        public static readonly string p_STD_Frames = "frames";
-
-        private static readonly GUIContent tempGUIContent = new ();
 
         private static readonly int paddingSize = 2;
 
@@ -65,15 +46,12 @@ namespace Ruccho.Fang
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(p_FrameMode));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_AnimationMinSpeed));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_AnimationMaxSpeed));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_AnimationStartTime));
 
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_ColliderType));
 
-                    tempGUIContent.text = "Is Slope (experimental)";
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(p_IsSlope), tempGUIContent);
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_ConnectableTiles));
                 }
 
@@ -94,8 +72,6 @@ namespace Ruccho.Fang
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(p_PixelsPerUnit));
                     }
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty(p_PhysicsShapeGeneration));
-                    
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_WrapMode));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(p_FilterMode));
 
@@ -107,8 +83,6 @@ namespace Ruccho.Fang
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
 
                         EditorGUILayout.LabelField("Sources", EditorStyles.boldLabel);
-
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty(p_NumSlopes));
 
                         mainChannelProp.objectReferenceValue = EditorGUILayout.ObjectField("Main Channel",
                             mainChannelProp.objectReferenceValue, typeof(Texture2D), false);
@@ -229,24 +203,24 @@ namespace Ruccho.Fang
 
             int width = mainChannel.width;
             int height = mainChannel.height;
-            int numSlopes = serializedObject.FindProperty(p_NumSlopes).intValue;
 
-            // 5 (base) + 
-            // 4 (slopeSize=1) +
-            // n * 4 * 2 (slopeSize=n) + 
-            // ...
-            int numTilesInFrame = 5 + 4 * numSlopes * (numSlopes + 1);
-            if (numSlopes >= 1) numTilesInFrame -= 4;
+            int tileSize = height / 5;
 
-            int tileSize = height / numTilesInFrame;
-
-            if (height % numTilesInFrame != 0 || width % tileSize != 0)
+            if (height % 5 != 0 || width % tileSize != 0)
             {
                 message = "Size of the texture has to be specific format:\n" +
                           " width:  (Tile size) * (Number of frame)\n" +
-                          $" height: (Tile size) * {numTilesInFrame} (when NumSlopes is {numSlopes})\n";
+                          " height: (Tile size) * 5\n";
                 return false;
             }
+
+            /*
+            if (!mainChannel.isReadable)
+            {
+                message = "Turn on \"Read / Write Enabled\" option in the Texture Import Settings.";
+                return false;
+            }
+            */
 
             var subChannelsProp = serializedObject.FindProperty(p_SubChannels);
 
@@ -335,10 +309,11 @@ namespace Ruccho.Fang
             }
             finally
             {
-                serializedObject.ApplyModifiedProperties();
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(target));
+
+                serializedObject.ApplyModifiedProperties();
             }
         }
 
@@ -364,10 +339,11 @@ namespace Ruccho.Fang
             }
             */
 
-            serializedObject.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+
             AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(target));
+            serializedObject.ApplyModifiedProperties();
         }
 
         public void GenerateCombination()
@@ -412,10 +388,6 @@ namespace Ruccho.Fang
 
             uint GetCombinationId(byte neighborCombination)
             {
-                // tl tc tr
-                // ml    mr
-                // bl bc br
-
                 bool bl = (neighborCombination & (1 << 0)) != 0;
                 bool bc = (neighborCombination & (1 << 1)) != 0;
                 bool br = (neighborCombination & (1 << 2)) != 0;
@@ -467,11 +439,11 @@ namespace Ruccho.Fang
             int wholeChannels = subChannelsProp.arraySize + 1;
 
 
-            IReadOnlyList<ITileImage> segments = GetSegments(enablePadding).ToList();
+            IReadOnlyList<TileCombinationSegment> segments = GetSegments().ToList();
 
             var segmentsOrdered = segments.OrderByDescending((seg) => seg.Width * seg.Height);
 
-            int texSize = GetSuitableTextureSize(segmentsOrdered);
+            int texSize = GetSuitableTextureSize(segmentsOrdered, enablePadding);
 
             //Validate textures
             for (int i = 0; i < Mathf.Max(wholeChannels, compiledChannelsProp.arraySize); i++)
@@ -495,18 +467,18 @@ namespace Ruccho.Fang
                     var element = compiledChannelsProp.GetArrayElementAtIndex(i);
                     var tex = element.objectReferenceValue as Texture2D;
                     var format = GraphicsFormat.R8G8B8A8_SRGB;
-
+                    
                     if (tex)
                     {
                         if (tex.width != texSize || tex.height != texSize || tex.graphicsFormat != format)
                         {
-                            tex.Reinitialize(texSize, texSize, format, false);
+                            tex.Resize(texSize, texSize, format, false);
                         }
                     }
                     else
                     {
                         tex = new Texture2D(texSize, texSize, DefaultFormat.LDR, TextureCreationFlags.None);
-                        tex.Reinitialize(texSize, texSize, format, false);
+                        tex.Resize(texSize, texSize, format, false);
                         tex.name = "Texture";
                         AssetDatabase.AddObjectToAsset(tex, target);
                         element.objectReferenceValue = tex;
@@ -523,7 +495,7 @@ namespace Ruccho.Fang
 
                 var dest = compiledChannelsProp.GetArrayElementAtIndex(0).objectReferenceValue as Texture2D;
                 GenerateTilesForTexture(dest, segmentsOrdered.Select(s => new TileDrawingItem(s, srcBuffer)),
-                    true);
+                    enablePadding, true);
             }
 
             for (int i = 1; i < wholeChannels; i++)
@@ -533,16 +505,20 @@ namespace Ruccho.Fang
 
                 var dest = compiledChannelsProp.GetArrayElementAtIndex(i).objectReferenceValue as Texture2D;
                 GenerateTilesForTexture(dest, segmentsOrdered.Select(s => new TileDrawingItem(s, srcBuffer)),
-                    false);
+                    enablePadding, false);
             }
         }
 
-        public static int GetSuitableTextureSize(IEnumerable<ITileImage> segmentsOrdered)
+        public static int GetSuitableTextureSize(IEnumerable<TileCombinationSegment> segmentsOrdered,
+            bool enablePadding)
         {
             ulong square = 0;
             foreach (var segment in segmentsOrdered)
             {
                 square += (ulong)(segment.Width * segment.Height);
+                if (enablePadding)
+                    square += (ulong)(segment.Width * paddingSize + segment.Height * paddingSize +
+                                      paddingSize * paddingSize);
             }
 
             int minTexSizeExp = Mathf.CeilToInt(Mathf.Log(2f, Mathf.Sqrt(square)));
@@ -559,8 +535,10 @@ namespace Ruccho.Fang
                     while (segmentOrdered.MoveNext())
                     {
                         int w = segmentOrdered.Current.Width;
+                        if (enablePadding) w += paddingSize;
 
                         int h = segmentOrdered.Current.Width;
+                        if (enablePadding) h += paddingSize;
 
                         hMax = Mathf.Max(h, hMax);
 
@@ -597,7 +575,7 @@ namespace Ruccho.Fang
         }
 
         public static void GenerateTilesForTexture(Texture2D dstChannel,
-            IEnumerable<TileDrawingItem> orderedSegments, bool createSprite)
+            IEnumerable<TileDrawingItem> orderedSegments, bool enablePadding, bool createSprite)
         {
             int texSize = dstChannel.width;
 
@@ -615,8 +593,10 @@ namespace Ruccho.Fang
                     var s = segment.Current.Segment;
 
                     int w = s.Width;
+                    if (enablePadding) w += paddingSize;
 
                     int h = s.Width;
+                    if (enablePadding) h += paddingSize;
 
                     hMax = Mathf.Max(h, hMax);
 
@@ -635,48 +615,38 @@ namespace Ruccho.Fang
                     }
 
                     //Debug.Log($"x: {x}, y : {y}");
-                    var spriteRect = s.LocalSpriteRect;
-                    spriteRect.x += x;
-                    spriteRect.y += y;
-
-                    s.Copy(srcChannel, dstBuffer, x, y);
+                    var spriteRect = new Rect(x, y, s.Width, s.Height);
+                    if (enablePadding)
+                    {
+                        s.Copy(srcChannel, dstBuffer, x + 1, y + 1, true);
+                        spriteRect.x += 1;
+                        spriteRect.y += 1;
+                    }
+                    else
+                    {
+                        s.Copy(srcChannel, dstBuffer, x, y, false);
+                    }
 
                     if (createSprite)
                     {
-                        var sprite = s.SpriteProperty.objectReferenceValue as Sprite;
-                        
-                        if (sprite) DestroyImmediate(sprite, true);
-
-                        sprite = Sprite.Create(dstChannel, spriteRect, new Vector2(0.5f, 0.5f),
-                            s.PixelsPerUnit, 0, SpriteMeshType.FullRect);
-
-                        AssetDatabase.AddObjectToAsset(sprite, s.SpriteProperty.serializedObject.targetObject);
-
-                        s.SpriteProperty.objectReferenceValue = sprite;
-                        
-                        sprite.hideFlags |= HideFlags.HideInHierarchy;
-
-                        var contours = s.PhysicsShape.Points;
-
-                        if (contours != null)
+                        var existSprite = s.SpriteProperty.objectReferenceValue as Sprite;
+                        if (existSprite && existSprite.texture == dstChannel && existSprite.rect.Equals(spriteRect) &&
+                            existSprite.pixelsPerUnit == s.PixelsPerUnit)
                         {
-                            var spriteSO = new SerializedObject(sprite);
-                            var contoursArrayProp = spriteSO.FindProperty("m_PhysicsShape");
-                            contoursArrayProp.arraySize = contours.Count;
-                            for (int i = 0; i < contours.Count; i++)
-                            {
-                                var pointsArrayProp = contoursArrayProp.GetArrayElementAtIndex(i);
-                                var points = contours[i];
-                                pointsArrayProp.arraySize = points.Length;
+                            //Use existing
+                            existSprite.hideFlags |= HideFlags.HideInHierarchy;
+                        }
+                        else
+                        {
+                            if (existSprite) DestroyImmediate(existSprite, true);
 
-                                for (int j = 0; j < points.Length; j++)
-                                {
-                                    var pointProp = pointsArrayProp.GetArrayElementAtIndex(j);
-                                    pointProp.vector2Value = points[j];
-                                }
-                            }
+                            Sprite sprite = Sprite.Create(dstChannel, spriteRect, new Vector2(0.5f, 0.5f),
+                                s.PixelsPerUnit);
+                            sprite.hideFlags |= HideFlags.HideInHierarchy;
 
-                            spriteSO.ApplyModifiedPropertiesWithoutUndo();
+                            AssetDatabase.AddObjectToAsset(sprite, s.SpriteProperty.serializedObject.targetObject);
+
+                            s.SpriteProperty.objectReferenceValue = sprite;
                         }
                     }
 
@@ -687,29 +657,19 @@ namespace Ruccho.Fang
             dstBuffer.Apply();
         }
 
-        public IEnumerable<ITileImage> GetSegments(bool enablePadding)
+        public IEnumerable<TileCombinationSegment> GetSegments()
         {
             var mainChannelProp = serializedObject.FindProperty(p_MainChannel);
 
             var explicitPixelsPerUnit = serializedObject.FindProperty(p_PixelsPerUnit).intValue;
             var oneTilePerUnit = serializedObject.FindProperty(p_OneTilePerUnit).boolValue;
-            var physicsShapeGeneration = (PhysicsShapeGenerationMode) serializedObject.FindProperty(p_PhysicsShapeGeneration).enumValueIndex;
-
-            var numSlopes = serializedObject.FindProperty(p_NumSlopes).intValue;
 
             var mainChannel = mainChannelProp.objectReferenceValue as Texture2D;
 
             int width = mainChannel.width;
             int height = mainChannel.height;
 
-            // 5 (base) + 
-            // 4 (slopeSize=1) +
-            // n * 4 * 2 (slopeSize=n) + 
-            // ...
-            int numTilesInFrame = 5 + 4 * numSlopes * (numSlopes + 1);
-            if (numSlopes >= 1) numTilesInFrame -= 4;
-
-            int tileSize = height / numTilesInFrame;
+            int tileSize = height / 5;
             int numFrames = width / tileSize;
 
             int pixelsPerUnit = oneTilePerUnit ? tileSize : explicitPixelsPerUnit;
@@ -746,142 +706,14 @@ namespace Ruccho.Fang
                 for (int frame = 0; frame < numFrames; frame++)
                 {
                     var frameProp = framesProp.GetArrayElementAtIndex(frame);
-                    var image = new TileCombinationImage(
+                    yield return new TileCombinationSegment(
                         GetSegment(tileSize, 0, frame, bl),
                         GetSegment(tileSize, 1, frame, br),
                         GetSegment(tileSize, 2, frame, tl),
                         GetSegment(tileSize, 3, frame, tr),
                         frameProp,
-                        pixelsPerUnit,
-                        enablePadding
+                        pixelsPerUnit
                     );
-                    if (physicsShapeGeneration == PhysicsShapeGenerationMode.Fine)
-                    {
-                        image.PhysicsShape = new(new List<Vector2[]>(new[]
-                        {
-                            new[]
-                            {
-                                new Vector2(-0.5f, -0.5f),
-                                new Vector2(-0.5f, 0.5f),
-                                new Vector2(0.5f, 0.5f),
-                                new Vector2(0.5f, -0.5f)
-                            }
-                        }));
-                    }
-
-                    yield return image;
-                }
-            }
-
-            // slopes
-
-            var slopeDefinitionProp = serializedObject.FindProperty(p_SlopeDefinition);
-
-            // - sizes
-
-            var sizesProp = slopeDefinitionProp.FindPropertyRelative(p_SD_Sizes);
-            sizesProp.arraySize = numSlopes;
-
-            int slopeVerticalCursor = 5;
-            for (int sizeIndex = 0; sizeIndex < numSlopes; sizeIndex++)
-            {
-                var sizeProp = sizesProp.GetArrayElementAtIndex(sizeIndex);
-                var floorUpProp = sizeProp.FindPropertyRelative(p_STSD_FloorUp);
-                var floorDownProp = sizeProp.FindPropertyRelative(p_STSD_FloorDown);
-                var ceilUpProp = sizeProp.FindPropertyRelative(p_STSD_CeilUp);
-                var ceilDownProp = sizeProp.FindPropertyRelative(p_STSD_CeilDown);
-
-
-                bool isVertical = false;
-                while (true)
-                {
-                    foreach (var image in ProcessSlopeAngle(floorUpProp, sizeIndex, isVertical, 0)) yield return image;
-                    foreach (var image in ProcessSlopeAngle(floorDownProp, sizeIndex, isVertical, 2))
-                        yield return image;
-                    foreach (var image in ProcessSlopeAngle(ceilUpProp, sizeIndex, isVertical, 1)) yield return image;
-                    foreach (var image in ProcessSlopeAngle(ceilDownProp, sizeIndex, isVertical, 3)) yield return image;
-
-                    if (isVertical) break;
-                    if (sizeIndex == 0) break;
-                    isVertical = true;
-                }
-
-                IEnumerable<ITileImage> ProcessSlopeAngle(SerializedProperty angleDefinition, int sizeIndex,
-                    bool isVertical, byte direction)
-                {
-                    var tilesProp = angleDefinition.FindPropertyRelative(
-                        isVertical ? p_STAD_VerticalTiles : p_STAD_HorizontalTiles);
-                    tilesProp.arraySize = sizeIndex + 1;
-                    for (int index = 0; index < sizeIndex + 1; index++)
-                    {
-                        var tileProp = tilesProp.GetArrayElementAtIndex(index);
-                        var framesProp = tileProp.FindPropertyRelative(p_STD_Frames);
-                        framesProp.arraySize = numFrames;
-
-                        for (int frame = 0; frame < numFrames; frame++)
-                        {
-                            var frameProp = framesProp.GetArrayElementAtIndex(frame);
-                            var seg = GetSegment(tileSize, frame, slopeVerticalCursor);
-
-                            var image = new TileSingleImage(seg, frameProp, pixelsPerUnit, enablePadding);
-
-                            // shape
-                            var shape = new List<Vector2>();
-
-                            if (physicsShapeGeneration == PhysicsShapeGenerationMode.Fine)
-                            {
-
-                                if (index > 0)
-                                {
-                                    shape.Add(new(0, (float)index / (sizeIndex + 1))); // left
-                                }
-
-                                shape.Add(new(1, (float)(index + 1) / (sizeIndex + 1))); // right
-                                shape.Add(new(1, 0)); // right (bottom)
-                                shape.Add(new(0, 0)); // left (bottom)
-
-
-                                // transform
-                                for (int i = 0; i < shape.Count; i++)
-                                {
-                                    var p = shape[i];
-
-                                    p.x -= 0.5f;
-                                    p.y -= 0.5f;
-
-                                    if (isVertical)
-                                    {
-                                        (p.x, p.y) = (-p.y, -p.x);
-                                    }
-
-                                    switch (direction)
-                                    {
-                                        case 0:
-                                            break;
-                                        case 1:
-                                            p.x = -p.x;
-                                            p.y = -p.y;
-                                            break;
-                                        case 2:
-                                            p.x = -p.x;
-                                            break;
-                                        case 3:
-                                            p.y = -p.y;
-                                            break;
-                                    }
-
-                                    shape[i] = p;
-                                }
-
-                                image.PhysicsShape = new(new List<Vector2[]>(new[] { shape.ToArray() }));
-                            }
-
-
-                            yield return image;
-                        }
-
-                        slopeVerticalCursor++;
-                    }
                 }
             }
         }
@@ -898,10 +730,6 @@ namespace Ruccho.Fang
 
             combinationsProp.ClearArray();
             combinationsProp.arraySize = 0;
-            
-            var sizesProp = serializedObject.FindProperty(p_SlopeDefinition).FindPropertyRelative(p_SD_Sizes);
-            sizesProp.ClearArray();
-            sizesProp.arraySize = 0;
         }
 
         private void ClearSprites()
@@ -910,43 +738,7 @@ namespace Ruccho.Fang
             for (int c = 0; c < combinationsProp.arraySize; c++)
             {
                 var framesProp = combinationsProp.GetArrayElementAtIndex(c).FindPropertyRelative(p_TC_Frames);
-                ClearFrames(framesProp);
-            }
 
-            var sizesProp = serializedObject.FindProperty(p_SlopeDefinition).FindPropertyRelative(p_SD_Sizes);
-            for (int i = 0; i < sizesProp.arraySize; i++)
-            {
-                var sizeProp = sizesProp.GetArrayElementAtIndex(i);
-                var floorUpProp = sizeProp.FindPropertyRelative(p_STSD_FloorUp);
-                var floorDownProp = sizeProp.FindPropertyRelative(p_STSD_FloorDown);
-                var ceilUpProp = sizeProp.FindPropertyRelative(p_STSD_CeilUp);
-                var ceilDownProp = sizeProp.FindPropertyRelative(p_STSD_CeilDown);
-
-                ClearAngle(floorUpProp);
-                ClearAngle(floorDownProp);
-                ClearAngle(ceilUpProp);
-                ClearAngle(ceilDownProp);
-
-                void ClearAngle(SerializedProperty angleProp)
-                {
-                    var horiProp = angleProp.FindPropertyRelative(p_STAD_HorizontalTiles);
-                    var vertProp = angleProp.FindPropertyRelative(p_STAD_VerticalTiles);
-
-                    ClearAngleSlope(horiProp);
-                    ClearAngleSlope(vertProp);
-                }
-
-                void ClearAngleSlope(SerializedProperty angleSlopeProp)
-                {
-                    for (int i = 0; i < angleSlopeProp.arraySize; i++)
-                    {
-                        ClearFrames(angleSlopeProp.GetArrayElementAtIndex(i).FindPropertyRelative(p_STD_Frames));
-                    }
-                }
-            }
-
-            void ClearFrames(SerializedProperty framesProp)
-            {
                 int numFrames = framesProp.arraySize;
                 for (int i = 0; i < numFrames; i++)
                 {
@@ -980,165 +772,47 @@ namespace Ruccho.Fang
         private static TileSegment GetSegment(int tileSize, int quarter, int frame, int kind)
         {
             int baseX = frame * tileSize;
-            int baseY = kind * tileSize;
+            int baseY = (4 - kind) * tileSize;
             int tileX = (quarter % 2 == 0) ? 0 : tileSize / 2;
-            int tileY = (quarter / 2 == 0) ? tileSize / 2 : 0;
+            int tileY = (quarter / 2 == 0) ? 0 : tileSize / 2;
             int width = (quarter % 2 == 0) ? tileSize / 2 : tileSize - tileSize / 2;
             int height = (quarter / 2 == 0) ? tileSize / 2 : tileSize - tileSize / 2;
 
             return new TileSegment(baseX + tileX, baseY + tileY, width, height);
-        }
-
-        private static TileSegment GetSegment(int tileSize, int frame, int kind)
-        {
-            int baseX = frame * tileSize;
-            int baseY = kind * tileSize;
-
-            return new TileSegment(baseX, baseY, tileSize, tileSize);
         }
     }
 
 
     public class TileDrawingItem
     {
-        public ITileImage Segment { get; }
+        public TileCombinationSegment Segment { get; }
         public TemporaryTexture2DBuffer SourceBuffer { get; }
 
-        public TileDrawingItem(ITileImage segment, TemporaryTexture2DBuffer sourceBuffer)
+        public TileDrawingItem(TileCombinationSegment segment, TemporaryTexture2DBuffer sourceBuffer)
         {
             Segment = segment;
             SourceBuffer = sourceBuffer;
         }
     }
 
-    public readonly struct TilePhysicsShape
+    public class TileCombinationSegment
     {
-        public List<Vector2[]> Points { get; }
-
-        public TilePhysicsShape(List<Vector2[]> points)
-        {
-            Points = points;
-        }
-    }
-
-    public interface ITileImage
-    {
-        int Width { get; }
-
-        int Height { get; }
-
-        Rect LocalSpriteRect { get; }
-
-        int PixelsPerUnit { get; }
-        SerializedProperty SpriteProperty { get; }
-
-        TilePhysicsShape PhysicsShape { get; }
-
-        void Copy(TemporaryTexture2DBuffer src, TemporaryTexture2DBuffer dst, int dstX, int dstY);
-    }
-
-    public class TileSingleImage : ITileImage
-    {
-        public bool Expand { get; }
-        public TileSegment Self { get; }
-
-        public SerializedProperty SpriteProperty { get; }
-        public TilePhysicsShape PhysicsShape { get; set; }
-
-        public int PixelsPerUnit { get; }
-
-        public int TileWidth => Self.W;
-        public int TileHeight => Self.H;
-
-        public int Width => Expand ? TileWidth + 2 : TileWidth;
-
-        public int Height => Expand ? TileHeight + 2 : TileHeight;
-
-        public Rect LocalSpriteRect =>
-            Expand ? new Rect(1, 1, TileWidth, TileHeight) : new Rect(0, 0, TileWidth, TileHeight);
-
-        public TileSingleImage(TileSegment self, SerializedProperty spriteProperty, int pixelsPerUnit, bool expand)
-        {
-            Expand = expand;
-            Self = self;
-            SpriteProperty = spriteProperty;
-            PixelsPerUnit = pixelsPerUnit;
-        }
-
-        public void Copy(TemporaryTexture2DBuffer src, TemporaryTexture2DBuffer dst, int dstX, int dstY)
-        {
-            bool expand = Expand;
-
-            var tileDstX = dstX;
-            var tileDstY = dstY;
-
-            if (expand)
-            {
-                tileDstX += 1;
-                tileDstY += 1;
-            }
-
-            Self.Copy(src, dst, tileDstX, tileDstY);
-
-            if (Expand)
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                int ToDstIndex(int localX, int localY) => dst.Width * (dstY + localY) + dstX + localX;
-
-                // edges
-                //  - bottom
-                Array.Copy(dst.Pixels, ToDstIndex(1, 1), dst.Pixels, ToDstIndex(1, 0),
-                    TileWidth);
-
-                //  - top
-                Array.Copy(dst.Pixels, ToDstIndex(1, TileHeight), dst.Pixels,
-                    ToDstIndex(1, TileHeight + 1), TileWidth);
-
-                // - side
-                for (int y = 0; y < TileHeight; y++)
-                {
-                    dst.Pixels[ToDstIndex(0, y + 1)] = dst.Pixels[ToDstIndex(1, y + 1)];
-                    dst.Pixels[ToDstIndex(TileWidth + 1, y + 1)] = dst.Pixels[ToDstIndex(TileWidth, y + 1)];
-                }
-
-                // corners
-
-                dst.Pixels[ToDstIndex(0, 0)] = dst.Pixels[ToDstIndex(1, 1)];
-                dst.Pixels[ToDstIndex(TileWidth + 1, 0)] = dst.Pixels[ToDstIndex(TileWidth, 1)];
-                dst.Pixels[ToDstIndex(0, TileHeight + 1)] = dst.Pixels[ToDstIndex(1, TileHeight)];
-                dst.Pixels[ToDstIndex(TileWidth + 1, TileHeight + 1)] = dst.Pixels[ToDstIndex(TileWidth, TileHeight)];
-            }
-        }
-    }
-
-    public class TileCombinationImage : ITileImage
-    {
-        public bool Expand { get; }
         public TileSegment Bl { get; }
         public TileSegment Br { get; }
         public TileSegment Tl { get; }
         public TileSegment Tr { get; }
 
         public SerializedProperty SpriteProperty { get; }
-        public TilePhysicsShape PhysicsShape { get; set; }
 
         public int PixelsPerUnit { get; }
 
-        public int TileWidth => Bl.W + Br.W;
-        public int TileHeight => Bl.H + Tl.H;
+        public int Width => Bl.W + Br.W;
 
-        public int Width => Expand ? TileWidth + 2 : TileWidth;
+        public int Height => Bl.H + Br.H;
 
-        public int Height => Expand ? TileHeight + 2 : TileHeight;
-
-        public Rect LocalSpriteRect =>
-            Expand ? new Rect(1, 1, TileWidth, TileHeight) : new Rect(0, 0, TileWidth, TileHeight);
-
-
-        public TileCombinationImage(TileSegment bl, TileSegment br, TileSegment tl, TileSegment tr,
-            SerializedProperty spriteProperty, int pixelsPerUnit, bool expand)
+        public TileCombinationSegment(TileSegment bl, TileSegment br, TileSegment tl, TileSegment tr,
+            SerializedProperty spriteProperty, int pixelsPerUnit)
         {
-            Expand = expand;
             Bl = bl;
             Br = br;
             Tl = tl;
@@ -1147,52 +821,33 @@ namespace Ruccho.Fang
             PixelsPerUnit = pixelsPerUnit;
         }
 
-        public void Copy(TemporaryTexture2DBuffer src, TemporaryTexture2DBuffer dst, int dstX, int dstY)
+        public void Copy(TemporaryTexture2DBuffer src, TemporaryTexture2DBuffer dst, int dstX, int dstY,
+            bool expand)
         {
-            bool expand = Expand;
-
-            var tileDstX = dstX;
-            var tileDstY = dstY;
+            Bl.Copy(src, dst, dstX, dstY);
+            Br.Copy(src, dst, dstX + Bl.W, dstY);
+            Tl.Copy(src, dst, dstX, dstY + Bl.H);
+            Tr.Copy(src, dst, dstX + Bl.W, dstY + Bl.H);
 
             if (expand)
             {
-                tileDstX += 1;
-                tileDstY += 1;
-            }
-
-
-            Bl.Copy(src, dst, tileDstX, tileDstY);
-            Br.Copy(src, dst, tileDstX + Bl.W, tileDstY);
-            Tl.Copy(src, dst, tileDstX, tileDstY + Bl.H);
-            Tr.Copy(src, dst, tileDstX + Bl.W, tileDstY + Bl.H);
-
-            if (Expand)
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                int ToDstIndex(int localX, int localY) => dst.Width * (dstY + localY) + dstX + localX;
-
-                // edges
-                //  - bottom
-                Array.Copy(dst.Pixels, ToDstIndex(1, 1), dst.Pixels, ToDstIndex(1, 0),
-                    TileWidth);
-
-                //  - top
-                Array.Copy(dst.Pixels, ToDstIndex(1, TileHeight), dst.Pixels,
-                    ToDstIndex(1, TileHeight + 1), TileWidth);
-
-                // - side
-                for (int y = 0; y < TileHeight; y++)
+                for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
                 {
-                    dst.Pixels[ToDstIndex(0, y + 1)] = dst.Pixels[ToDstIndex(1, y + 1)];
-                    dst.Pixels[ToDstIndex(TileWidth + 1, y + 1)] = dst.Pixels[ToDstIndex(TileWidth, y + 1)];
+                    Color c = dst.Pixels[dst.Width * (dstY + y) + dstX + x];
+                    if (y == 0) dst.Pixels[dst.Width * (dstY + y - 1) + dstX + x] = c;
+                    if (y == Height - 1) dst.Pixels[dst.Width * (dstY + y + 1) + dstX + x] = c;
+                    if (x == 0) dst.Pixels[dst.Width * (dstY + y) + dstX + x - 1] = c;
+                    if (x == Width - 1) dst.Pixels[dst.Width * (dstY + y) + dstX + x + 1] = c;
                 }
 
-                // corners
-
-                dst.Pixels[ToDstIndex(0, 0)] = dst.Pixels[ToDstIndex(1, 1)];
-                dst.Pixels[ToDstIndex(TileWidth + 1, 0)] = dst.Pixels[ToDstIndex(TileWidth, 1)];
-                dst.Pixels[ToDstIndex(0, TileHeight + 1)] = dst.Pixels[ToDstIndex(1, TileHeight)];
-                dst.Pixels[ToDstIndex(TileWidth + 1, TileHeight + 1)] = dst.Pixels[ToDstIndex(TileWidth, TileHeight)];
+                dst.Pixels[dst.Width * (dstY - 1) + dstX - 1] = dst.Pixels[dst.Width * (dstY) + dstX];
+                dst.Pixels[dst.Width * (dstY - 1) + dstX + Width] =
+                    dst.Pixels[dst.Width * (dstY) + dstX + Width - 1];
+                dst.Pixels[dst.Width * (dstY + Height) + dstX - 1] =
+                    dst.Pixels[dst.Width * (dstY + Height - 1) + dstX];
+                dst.Pixels[dst.Width * (dstY + Height) + dstX + Width] =
+                    dst.Pixels[dst.Width * (dstY + Height - 1) + dstX + Width - 1];
             }
         }
     }
@@ -1286,10 +941,7 @@ namespace Ruccho.Fang
         public void Copy(TemporaryTexture2DBuffer src, TemporaryTexture2DBuffer dst, int dstX, int dstY)
         {
             //Debug.Log($"Copy segment src: ({X}, {Y}), dst: ({dstX}, {dstY}), size: ({W}, {H})");
-
-            var srcYFlipped = src.Height - Y - H;
-
-            src.CopyTo(dst, X, srcYFlipped, dstX, dstY, W, H);
+            src.CopyTo(dst, X, Y, dstX, dstY, W, H);
         }
     }
 
