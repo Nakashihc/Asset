@@ -4,26 +4,47 @@ using UnityEngine;
 
 public class TriggerNPCLvl2 : MonoBehaviour
 {
-    public List<GameObject> NPCsInTrigger = new List<GameObject>();
+    private Dictionary<GameObject, Coroutine> CowokCoroutines = new Dictionary<GameObject, Coroutine>();
+    private Dictionary<GameObject, Coroutine> CewekCoroutines = new Dictionary<GameObject, Coroutine>();
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("NPC") && other.CompareTag("NPCcewek"))
+        if (other.CompareTag("NPC"))
         {
-            NPCsInTrigger.Add(other.gameObject);
-            Debug.Log("NPC masuk trigger: " + other.gameObject.name);
-
-            StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl2());
+            if (!CowokCoroutines.ContainsKey(other.gameObject))
+            {
+                Coroutine coroutine = StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl2());
+                CowokCoroutines.Add(other.gameObject, coroutine);
+            }
+        }
+        if (other.CompareTag("NPCcewek"))
+        {
+            if (!CewekCoroutines.ContainsKey(other.gameObject))
+            {
+                Coroutine coroutine = StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl2());
+                CewekCoroutines.Add(other.gameObject, coroutine);
+            }
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("NPC") && other.CompareTag("NPCcewek"))
+        if (other.CompareTag("NPC"))
         {
-            NPCsInTrigger.Remove(other.gameObject);
-            Debug.Log("NPC keluar trigger: " + other.gameObject.name);
-            StopCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl2());
+            if (CowokCoroutines.ContainsKey(other.gameObject))
+            {
+                StopCoroutine(CowokCoroutines[other.gameObject]);
+                CowokCoroutines.Remove(other.gameObject);
+            }
+        }
+
+        if (other.CompareTag("NPCcewek"))
+        {
+            if (CewekCoroutines.ContainsKey(other.gameObject))
+            {
+                StopCoroutine(CewekCoroutines[other.gameObject]);
+                CewekCoroutines.Remove(other.gameObject);
+            }
         }
     }
 

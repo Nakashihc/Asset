@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 7298441140445141439}
   m_Layer: 0
   m_Name: Bangunan1
-  m_TagString: Untagged
+  m_TagString: bangunan1lvl1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -363,4 +363,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31aa929124ab78d40860f6e2c8337108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NPCsInTrigger: []

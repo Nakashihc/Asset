@@ -199,9 +199,10 @@ GameObject:
   - component: {fileID: 6312844379706899505}
   - component: {fileID: 4334889988993997455}
   - component: {fileID: 3743546683139664957}
+  - component: {fileID: -4441001985267287703}
   m_Layer: 0
   m_Name: Bangunan2
-  m_TagString: Untagged
+  m_TagString: bangunan2lvl1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -363,4 +364,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31aa929124ab78d40860f6e2c8337108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NPCsInTrigger: []
+--- !u!114 &-4441001985267287703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8768332317012034972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991404a1484ac4743a74d0647d34b03c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level1: {fileID: 0}
+  Level2: {fileID: 0}
+  HargaUpgrade: 500
+  upiahTidakCukup: {fileID: 0}
+  levelTidakSampai: {fileID: 0}

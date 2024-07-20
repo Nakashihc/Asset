@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class TriggerNPCLvl1 : MonoBehaviour
 {
-    public List<GameObject> NPCcowokInTrigger = new List<GameObject>();
-    public List<GameObject> NPCcewekInTrigger = new List<GameObject>();
+    private Dictionary<GameObject, Coroutine> CowokCoroutines = new Dictionary<GameObject, Coroutine>();
+    private Dictionary<GameObject, Coroutine> CewekCoroutines = new Dictionary<GameObject, Coroutine>();
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("NPC"))
         {
-            NPCcowokInTrigger.Add(other.gameObject);
-            Debug.Log("NPC masuk trigger: " + other.gameObject.name);
-
-            StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
+            if (!CowokCoroutines.ContainsKey(other.gameObject))
+            {
+                Coroutine coroutine = StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
+                CowokCoroutines.Add(other.gameObject, coroutine);
+            }
         }
         if (other.CompareTag("NPCcewek"))
         {
-            NPCcewekInTrigger.Add(other.gameObject);
-            Debug.Log("NPC masuk trigger: " + other.gameObject.name);
-
-            StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
+            if (!CewekCoroutines.ContainsKey(other.gameObject))
+            {
+                Coroutine coroutine = StartCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
+                CewekCoroutines.Add(other.gameObject, coroutine);
+            }
         }
     }
 
@@ -29,16 +31,20 @@ public class TriggerNPCLvl1 : MonoBehaviour
     {
         if (other.CompareTag("NPC"))
         {
-            StopCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
-            NPCcowokInTrigger.Remove(other.gameObject);
-            Debug.Log("Cowok keluar trigger: " + other.gameObject.name);
+            if (CowokCoroutines.ContainsKey(other.gameObject))
+            {
+                StopCoroutine(CowokCoroutines[other.gameObject]);
+                CowokCoroutines.Remove(other.gameObject);
+            }
         }
         
         if (other.CompareTag("NPCcewek"))
         {
-            StopCoroutine(UpiahManager.instance.AddUpiahWithDelaylvl1());
-            NPCcewekInTrigger.Remove(other.gameObject);
-            Debug.Log("Cewek keluar trigger: " + other.gameObject.name);
+            if (CewekCoroutines.ContainsKey(other.gameObject))
+            {
+                StopCoroutine(CewekCoroutines[other.gameObject]);
+                CewekCoroutines.Remove(other.gameObject);
+            }
         }
     }
 

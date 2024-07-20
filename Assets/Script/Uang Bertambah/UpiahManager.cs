@@ -15,15 +15,15 @@ public class UpiahManager : MonoBehaviour
 
     [Header("Waktu saat dalam Ruangan")]
     public int delayTime;
-    public int delaylvl1 = 5;
-    public int delaylvl2 = 4;
-    public int delaylvl3 = 3;
+    public int delaylvl1;
+    public int delaylvl2;
+    public int delaylvl3;
 
     [Header("Upiah Bertambah")]
     public int upiahnambah;
-    public int bangunanlvl1 = 10;
-    public int bangunanlvl2 = 20;
-    public int bangunanlvl3 = 30;
+    public int bangunanlvl1;
+    public int bangunanlvl2;
+    public int bangunanlvl3;
 
     private void Awake()
     {
@@ -85,5 +85,4 @@ public class UpiahManager : MonoBehaviour
             UpiahTambah(bangunanlvl3);
         }
     }
-
 }

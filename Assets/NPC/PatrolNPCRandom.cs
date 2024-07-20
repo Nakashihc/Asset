@@ -19,7 +19,7 @@ public class PatrolNPCRandom : MonoBehaviour
     // Script Sambungan
     private NPCManager npcManager;
 
-    private enum NPCState { Path1, Path2, RandomMove, ExitPath1, ExitPath2, MoveToDeadSpot }
+    private enum NPCState { Path1, Path2, RandomMove, ExitPath1, ExitPath2, MoveToDeadSpot, CumaLewat }
     private NPCState currentState;
 
     [Header("Waktu NPC Bertahan dalam Museum")]
@@ -27,12 +27,23 @@ public class PatrolNPCRandom : MonoBehaviour
     public int minimalwaktu;
     private int waktuacak;
 
+    [Header("Peluang ke Path1")]
+    [Range(0, 1)] public float chanceToPath1;
+
     void Start()
     {
         npcManager = GameObject.FindObjectOfType<NPCManager>();
         jam = GameObject.FindObjectOfType<Jam>();
 
-        currentState = NPCState.Path1;
+        if (Random.value <= chanceToPath1)
+        {
+            currentState = NPCState.Path1;
+        }
+        else
+        {
+            currentState = NPCState.CumaLewat;
+        }
+
         timer = waitTime;
         patrolTimer = 0;
 
@@ -102,6 +113,13 @@ public class PatrolNPCRandom : MonoBehaviour
             case NPCState.MoveToDeadSpot:
                 MoveTo(npcManager.deadSpots[currentDeadSpotIndex].position);
                 if (Vector2.Distance(transform.position, npcManager.deadSpots[currentDeadSpotIndex].position) < 0.2f)
+                {
+                    Destroy(gameObject);
+                }
+                break;
+            case NPCState.CumaLewat:
+                MoveTo(npcManager.cumalewat.position);
+                if (Vector2.Distance(transform.position, npcManager.cumalewat.position) < 0.2f)
                 {
                     Destroy(gameObject);
                 }

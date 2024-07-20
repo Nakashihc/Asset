@@ -9,8 +9,10 @@ public class NPCManager : MonoBehaviour
     public GameObject npcPrefab;
     public GameObject cewekPrefab;
 
-    public float spawnInterval = 5f;
+    private float minWaktu = 1f;
+    public float maxWaktu = 5f;
     public int maxNPCs = 5;
+    private float spawnacakk;
 
     private float nextSpawnTime;
     private List<GameObject> npcs = new List<GameObject>();
@@ -33,12 +35,15 @@ public class NPCManager : MonoBehaviour
     [Header ("Tempat Hilang")]
     public Transform[] deadSpots;
 
+    [Header("Cuma Lewat")]
+    public Transform cumalewat;
+
     private Jam jam;
 
     void Start()
     {
         jam = GameObject.FindObjectOfType<Jam>();
-        nextSpawnTime = Time.time + spawnInterval;
+        nextSpawnTime = Time.time + spawnacakk;
         moveSpots = GameObject.FindObjectsOfType<Transform>().Where(t => t.CompareTag("MoveSpot")).ToArray();
     }
 
@@ -47,7 +52,7 @@ public class NPCManager : MonoBehaviour
         if (Time.time >= nextSpawnTime && npcs.Count < maxNPCs)
         {
             SpawnNPC();
-            nextSpawnTime = Time.time + spawnInterval;
+            nextSpawnTime = Time.time + spawnacakk;
         }
         moveSpots = GameObject.FindObjectsOfType<Transform>().Where(t => t.CompareTag("MoveSpot")).ToArray();
     }
@@ -56,6 +61,8 @@ public class NPCManager : MonoBehaviour
     {
         Transform randomSpawnSpot = Random.value > 0.5f ? Spawn1 : Spawn2;
         GameObject prefabToSpawn = Random.value > 0.5f ? npcPrefab : cewekPrefab;
+
+        spawnacakk = Random.Range(minWaktu, maxWaktu);
 
         GameObject npc = Instantiate(prefabToSpawn, randomSpawnSpot.position, Quaternion.identity);
         npcs.Add(npc);

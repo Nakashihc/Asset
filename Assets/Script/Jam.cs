@@ -26,7 +26,7 @@ public class Jam : MonoBehaviour
 
     private float waktuberjalan = 0.2f;
 
-    private string[] hariArray = { "Senin", "Selasa", "Rabu", "Kamis" };
+    private string[] hariArray = { "Monday", "Tuesday", "Wednesday", "Thursday" };
     private int hariIndex;
 
     private void Start()

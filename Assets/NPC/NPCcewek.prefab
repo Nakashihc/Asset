@@ -283,3 +283,4 @@ MonoBehaviour:
   waitTime: 10
   waktuBertahan: 60
   minimalwaktu: 20
+  chanceToPath1: 0.8
