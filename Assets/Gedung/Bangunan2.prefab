@@ -376,8 +376,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 991404a1484ac4743a74d0647d34b03c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level1: {fileID: 0}
+  Tomboll: {fileID: 0}
   Level2: {fileID: 0}
   HargaUpgrade: 500
   upiahTidakCukup: {fileID: 0}
   levelTidakSampai: {fileID: 0}
+  UpgradeSelesai: {fileID: 0}

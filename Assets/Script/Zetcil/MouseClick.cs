@@ -14,6 +14,7 @@ public class MouseClick : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (!this.enabled) return;
         Vector3 mousePosition = Input.mousePosition;
         OnMouseDownEvent.Invoke();
     }
@@ -23,4 +24,16 @@ public class MouseClick : MonoBehaviour
         Vector3 mousePosition = Input.mousePosition;
         OnMouseUpEvent.Invoke();
     }
+
+    public void DisableScript()
+    {
+        this.enabled = false;
+    }
+
+    // Function to enable this script
+    public void EnableScript()
+    {
+        this.enabled = true;
+    }
+
 }

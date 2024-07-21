@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class Objectplacer : MonoBehaviour
 {
     [Header ("Object Taruh")]
@@ -11,16 +10,25 @@ public class Objectplacer : MonoBehaviour
     public GameObject Upgrade1Lvl2;
     public GameObject Upgrade2Lvl2;
     public GameObject Upgrade3Lvl2;
+    public GameObject Upgrade4Lvl2;
+    public GameObject Upgrade5Lvl2;
+    public GameObject Upgrade6Lvl2;
 
     [Header ("Bangunan diBangun")]
     public GameObject bangunan1;
     public GameObject bangunan2;
     public GameObject bangunan3;
+    public GameObject bangunan4;
+    public GameObject bangunan5;
+    public GameObject bangunan6;
 
     [Header("Harga Bangunan")]
     public int Harga1;
     public int Harga2;
     public int Harga3;
+    public int Harga4;
+    public int Harga5;
+    public int Harga6;
 
     private UpiahManager upiahManager;
     private XPSystem xpSystem;
@@ -56,15 +64,15 @@ public class Objectplacer : MonoBehaviour
 
     public void Taruhbangunan2()
     {
-        if (upiahManager.totalUpiah <= Harga2)
-        {
-            Debug.Log("Tidak Cukup Upiah");
-            upiahTidakCukup.ShowUI();
-        }
-        else if (xpSystem.Level <= 1)
+        if (xpSystem.Level <= 1)
         {
             levelTidakSampai.ShowUI();
             Debug.Log("Level Tidak Cukup");
+        }
+        else if (upiahManager.totalUpiah <= Harga2)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+            upiahTidakCukup.ShowUI();
         }
         else
         {
@@ -79,15 +87,15 @@ public class Objectplacer : MonoBehaviour
 
     public void Taruhbangunan3()
     {
-        if (upiahManager.totalUpiah <= Harga3)
-        {
-            Debug.Log("Tidak Cukup Upiah");
-            upiahTidakCukup.ShowUI();
-        }
-        else if (xpSystem.Level <= 2)
+        if (xpSystem.Level <= 2)
         {
             Debug.Log("Level Tidak Cukup");
             levelTidakSampai.ShowUI();
+        }
+        else if (upiahManager.totalUpiah <= Harga3)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+            upiahTidakCukup.ShowUI();
         }
         else
         {
@@ -95,6 +103,72 @@ public class Objectplacer : MonoBehaviour
             Instantiate(bangunan3, object2D.transform.position, Quaternion.identity);
             object2D.SetActive(false);
             Upgrade3Lvl2.SetActive(true);
+            BerhasilDibangun.ShowUI();
+        }
+    }
+    
+    public void Taruhbangunan4()
+    {
+        if (xpSystem.Level <= 3)
+        {
+            Debug.Log("Level Tidak Cukup");
+            levelTidakSampai.ShowUI();
+        }
+        else if (upiahManager.totalUpiah <= Harga4)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+            upiahTidakCukup.ShowUI();
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga4);
+            Instantiate(bangunan4, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+            Upgrade4Lvl2.SetActive(true);
+            BerhasilDibangun.ShowUI();
+        }
+    }
+    
+    public void Taruhbangunan5()
+    {
+        if (xpSystem.Level <= 4)
+        {
+            Debug.Log("Level Tidak Cukup");
+            levelTidakSampai.ShowUI();
+        }
+        else if (upiahManager.totalUpiah <= Harga5)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+            upiahTidakCukup.ShowUI();
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga5);
+            Instantiate(bangunan5, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+            Upgrade5Lvl2.SetActive(true);
+            BerhasilDibangun.ShowUI();
+        }
+    }
+    
+    public void Taruhbangunan6()
+    {
+        if (xpSystem.Level <= 5)
+        {
+            Debug.Log("Level Tidak Cukup");
+            levelTidakSampai.ShowUI();
+        }
+        if (upiahManager.totalUpiah <= Harga6)
+        {
+            Debug.Log("Tidak Cukup Upiah");
+            upiahTidakCukup.ShowUI();
+        }
+        else
+        {
+            upiahManager.UpiahKurang(Harga6);
+            Instantiate(bangunan6, object2D.transform.position, Quaternion.identity);
+            object2D.SetActive(false);
+            Upgrade5Lvl2.SetActive(true);
             BerhasilDibangun.ShowUI();
         }
     }

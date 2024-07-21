@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class Upgrade1Lvl : MonoBehaviour
 {
+    [Header("Tag Object")]
+    public string TagObjt;
+
     [Header("Tombolnya")]
     public GameObject Tomboll;
 
@@ -15,6 +18,7 @@ public class Upgrade1Lvl : MonoBehaviour
     [Header("Harga Bangunan")]
     public int HargaUpgrade;
 
+    [Header("Animasi")]
     private UpiahManager upiahManager;
     private XPSystem xpSystem;
     public ZoomAnimator upiahTidakCukup;
@@ -51,6 +55,6 @@ public class Upgrade1Lvl : MonoBehaviour
 
     public void TemukanObject()
     {
-        level1 = GameObject.FindGameObjectWithTag("bangunan1lvl1");
+        level1 = GameObject.FindGameObjectWithTag(TagObjt);
     }
 }

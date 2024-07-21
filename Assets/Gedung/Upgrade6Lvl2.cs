@@ -2,11 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class Upgrade2Lvl2 : MonoBehaviour
+public class Upgrade6Lvl2 : MonoBehaviour
 {
-    [Header("Tag Object")]
-    public string TagObjt;
-
     [Header("Tombolnya")]
     public GameObject Tomboll;
     private GameObject level1;
@@ -20,7 +17,7 @@ public class Upgrade2Lvl2 : MonoBehaviour
     private UpiahManager upiahManager;
     private XPSystem xpSystem;
 
-    [Header ("Animasi")]
+    [Header("Animasi")]
     public ZoomAnimator upiahTidakCukup;
     public ZoomAnimator levelTidakSampai;
     public ZoomAnimator UpgradeSelesai;
@@ -31,7 +28,7 @@ public class Upgrade2Lvl2 : MonoBehaviour
         xpSystem = GameObject.FindObjectOfType<XPSystem>();
     }
 
-    public void Bangunan2Lvl2()
+    public void Bangunan3Lvl2()
     {
         if (upiahManager.totalUpiah <= HargaUpgrade)
         {
@@ -55,6 +52,6 @@ public class Upgrade2Lvl2 : MonoBehaviour
 
     public void TemukanObject()
     {
-        level1 = GameObject.FindGameObjectWithTag(TagObjt);
+        level1 = GameObject.FindGameObjectWithTag("bangunan3lvl1");
     }
 }
