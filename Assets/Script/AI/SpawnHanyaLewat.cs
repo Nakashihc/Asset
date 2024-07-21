@@ -5,8 +5,8 @@ using UnityEngine;
 public class SpawnHanyaLewat : MonoBehaviour
 {
     [Header("Spawn Prefabs")]
-    public GameObject npcCowokPrefab;
-    public GameObject npcCewekPrefab;
+    public GameObject[] Cowok;
+    public GameObject[] Cewek;
     public Transform[] spawnPoints; // Dua spawn points
     public Transform[] cumaLewatPoints; // Dua cuma lewat points
 
@@ -40,8 +40,16 @@ public class SpawnHanyaLewat : MonoBehaviour
         Transform spawnPoint = spawnPoints[spawnIndex];
         Transform cumaLewatPoint = (spawnIndex == 0) ? cumaLewatPoints[1] : cumaLewatPoints[0];
 
-        // Pilih prefab secara acak
-        GameObject npcPrefab = Random.value > 0.5f ? npcCowokPrefab : npcCewekPrefab;
+        // Pilih prefab cowok atau cewek secara acak dari array
+        GameObject npcPrefab;
+        if (Random.value > 0.5f)
+        {
+            npcPrefab = Cowok[Random.Range(0, Cowok.Length)];
+        }
+        else
+        {
+            npcPrefab = Cewek[Random.Range(0, Cewek.Length)];
+        }
 
         GameObject npc = Instantiate(npcPrefab, spawnPoint.position, Quaternion.identity);
         HanyaLewat patrolScript = npc.GetComponent<HanyaLewat>();

@@ -5,10 +5,11 @@ using System.Linq;
 
 public class NPCManager : MonoBehaviour
 {
-    [Header ("Spawn Prefab")]
-    public GameObject npcPrefab;
-    public GameObject cewekPrefab;
+    [Header("Spawn Prefab")]
+    public GameObject[] cowokPrefabs;
+    public GameObject[] cewekPrefabs;
 
+    [Header("Waktu Spawn")]
     private float minWaktu = 1f;
     public float maxWaktu = 5f;
     public int maxNPCs = 5;
@@ -17,22 +18,22 @@ public class NPCManager : MonoBehaviour
     private float nextSpawnTime;
     private List<GameObject> npcs = new List<GameObject>();
 
-    [Header ("Tempat Spawn")]
+    [Header("Tempat Spawn")]
     public Transform Spawn1;
     public Transform Spawn2;
 
-    [Header ("Jalan Masuk")]
+    [Header("Jalan Masuk")]
     public Transform pathSpot1;
     public Transform pathSpot2;
 
-    [Header ("Acak Lokasi Dalam Museum")]
+    [Header("Acak Lokasi Dalam Museum")]
     public Transform[] moveSpots;
 
-    [Header ("Jalan Keluar")]
+    [Header("Jalan Keluar")]
     public Transform keluarr;
     public Transform keluarr2;
 
-    [Header ("Tempat Hilang")]
+    [Header("Tempat Hilang")]
     public Transform[] deadSpots;
 
     [Header("Cuma Lewat")]
@@ -60,7 +61,17 @@ public class NPCManager : MonoBehaviour
     void SpawnNPC()
     {
         Transform randomSpawnSpot = Random.value > 0.5f ? Spawn1 : Spawn2;
-        GameObject prefabToSpawn = Random.value > 0.5f ? npcPrefab : cewekPrefab;
+
+        // Pilih secara acak prefab cowok atau cewek
+        GameObject prefabToSpawn;
+        if (Random.value > 0.5f)
+        {
+            prefabToSpawn = cowokPrefabs[Random.Range(0, cowokPrefabs.Length)];
+        }
+        else
+        {
+            prefabToSpawn = cewekPrefabs[Random.Range(0, cewekPrefabs.Length)];
+        }
 
         spawnacakk = Random.Range(minWaktu, maxWaktu);
 
