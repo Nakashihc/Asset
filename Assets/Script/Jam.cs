@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using System.Collections;
 
 public class Jam : MonoBehaviour
 {
@@ -10,7 +11,6 @@ public class Jam : MonoBehaviour
     public TextMeshProUGUI hariTextMesh;
 
     [Header("Pintu Museum")]
-    public GameObject menuObject;
     public Animator Pintu1;
     public Animator Pintu2;
 
@@ -18,6 +18,9 @@ public class Jam : MonoBehaviour
 
     [Header("Event Jam 16.00")]
     public UnityEvent JamTertentu;
+
+    [Header("Jam Tutup")]
+    public UnityEvent HariSelesai;
 
     [Header("Waktu")]
     public int jam;
@@ -55,7 +58,7 @@ public class Jam : MonoBehaviour
             jam += 1;
         }
 
-        if(jam == 16 && menit == 26)
+        if (jam >= 16 && menit >= 0)
         {
             JamTertentu?.Invoke();
             waktuberjalan = 0.5f;
@@ -77,8 +80,8 @@ public class Jam : MonoBehaviour
         if (jam >= 17)
         {
             waktuBerhenti = true;
-            menuObject.SetActive(true);
-            Time.timeScale = 0;
+            HariSelesai?.Invoke();
+            StartCoroutine(SetTimeScaleAfterDelay(0, 1f)); // Mulai coroutine untuk mengatur Time.timeScale setelah delay
         }
 
         UpdateWaktu();
@@ -86,7 +89,6 @@ public class Jam : MonoBehaviour
 
     public void LanjutkanWaktu()
     {
-        menuObject.SetActive(false);
         waktuBerhenti = false;
         hariIndex = (hariIndex + 1) % hariArray.Length;
         UpdateHari();
@@ -105,5 +107,19 @@ public class Jam : MonoBehaviour
     private void UpdateHari()
     {
         hariTextMesh.text = hariArray[hariIndex];
+    }
+
+    private IEnumerator SetTimeScaleAfterDelay(float targetScale, float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        Time.timeScale = targetScale;
+    }
+    public void WaktuMelambat(float berapalambat)
+    {
+        waktuberjalan = berapalambat;
+    }
+    public void WaktuKembali()
+    {
+        waktuberjalan = 0.2f;
     }
 }

@@ -198,7 +198,6 @@ GameObject:
   - component: {fileID: 3264086637192414672}
   - component: {fileID: -6293688155399910375}
   - component: {fileID: -2311117284761796657}
-  - component: {fileID: -5615768988243539977}
   - component: {fileID: -5550512815618474729}
   m_Layer: 0
   m_Name: Bangunan3lvl2
@@ -268,7 +267,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 55
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.59089905, g: 1, b: 0.5424528, a: 1}
   m_FlipX: 0
@@ -352,23 +351,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-5615768988243539977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8768332317012034972}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 991404a1484ac4743a74d0647d34b03c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tomboll: {fileID: 0}
-  Level2: {fileID: 0}
-  HargaUpgrade: 0
-  upiahTidakCukup: {fileID: 0}
-  levelTidakSampai: {fileID: 0}
 --- !u!114 &-5550512815618474729
 MonoBehaviour:
   m_ObjectHideFlags: 0

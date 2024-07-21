@@ -31,7 +31,7 @@ public class Upgrade1Lvl : MonoBehaviour
         xpSystem = GameObject.FindObjectOfType<XPSystem>();
     }
 
-    public void Bangunan1Lvl2()
+    public void BangunanLevel2()
     {
         if (upiahManager.totalUpiah <= HargaUpgrade)
         {
