@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -25,11 +24,18 @@ public class UpiahManager : MonoBehaviour
     public int bangunanlvl2;
     public int bangunanlvl3;
 
+    [Header("Animasi Upiah")]
+    public float animationDuration = 0.5f;
+    public Color increaseColor = Color.green;
+    public Color decreaseColor = Color.red;
+    private Color originalColor;
+
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            originalColor = upiahText.color;
         }
         else
         {
@@ -37,15 +43,23 @@ public class UpiahManager : MonoBehaviour
         }
     }
 
-    void Update()
+    void Start()
     {
         UpiahText();
     }
 
     public void UpiahTambah(int amount)
     {
+        int oldTotal = totalUpiah;
         totalUpiah += amount;
-        UpiahText();
+        StartCoroutine(AnimateText(oldTotal, totalUpiah, amount > 0 ? increaseColor : decreaseColor));
+    }
+
+    public void UpiahKurang(int berkurang)
+    {
+        int oldTotal = totalUpiah;
+        totalUpiah -= berkurang;
+        StartCoroutine(AnimateText(oldTotal, totalUpiah, berkurang > 0 ? decreaseColor : increaseColor));
     }
 
     private void UpiahText()
@@ -53,10 +67,20 @@ public class UpiahManager : MonoBehaviour
         upiahText.text = "Upiah : " + totalUpiah.ToString();
     }
 
-    public void UpiahKurang(int berkurang)
+    private IEnumerator AnimateText(int startValue, int endValue, Color targetColor)
     {
-        totalUpiah -= berkurang;
-        UpiahText();
+        float elapsedTime = 0f;
+        while (elapsedTime < animationDuration)
+        {
+            int currentValue = (int)Mathf.Lerp(startValue, endValue, elapsedTime / animationDuration);
+            upiahText.text = "Upiah : " + currentValue.ToString();
+            upiahText.color = Color.Lerp(originalColor, targetColor, elapsedTime / animationDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        upiahText.text = "Upiah : " + endValue.ToString();
+        upiahText.color = originalColor;
     }
 
     public IEnumerator AddUpiahWithDelaylvl1()

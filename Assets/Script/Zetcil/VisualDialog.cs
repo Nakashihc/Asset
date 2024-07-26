@@ -16,6 +16,7 @@ public class VisualDialog : MonoBehaviour
         public string name;
         [TextArea(5, 6)]
         public string dialog;
+        public List<string> boldSentences;
     }
 
     [Header("Player Name")]
@@ -122,6 +123,10 @@ public class VisualDialog : MonoBehaviour
         {
             editedString = EditString(activeDialog, "<name>", player);
         }
+
+        // Apply bold formatting
+        editedString = ApplyBoldFormatting(editedString, dialogData.boldSentences);
+
         if (typewriting)
         {
             DialogCoroutine = StartCoroutine(TypeText(editedString));
@@ -130,6 +135,15 @@ public class VisualDialog : MonoBehaviour
         {
             dialogText.text = editedString;
         }
+    }
+
+    string ApplyBoldFormatting(string dialog, List<string> boldSentences)
+    {
+        foreach (string sentence in boldSentences)
+        {
+            dialog = dialog.Replace(sentence, $"<b>{sentence}</b>");
+        }
+        return dialog;
     }
 
     IEnumerator TypeText(string fullString)
