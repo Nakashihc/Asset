@@ -48,6 +48,7 @@ public class VisualDialog : MonoBehaviour
     string currentText = "";
     private int currentDialogIndex = 0;
     private Coroutine DialogCoroutine;
+    private bool isDialogRunning = false;
 
     public void StartDialog()
     {
@@ -63,18 +64,25 @@ public class VisualDialog : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return))
+        if ((Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return)) && isDialogRunning)
         {
-            NextDialog();
+            if (typewriting && DialogCoroutine != null)
+            {
+                StopCoroutine(DialogCoroutine);
+                dialogText.text = activeDialog;
+                typewriting = false;
+            }
+            else
+            {
+                typewriting = true;
+                NextDialog();
+            }
         }
     }
 
     void NextDialog()
     {
-        if (typewriting && DialogCoroutine != null)
-        {
-            StopCoroutine(DialogCoroutine);
-        }
+        isDialogRunning = false;
         currentDialogIndex++;
         currentText = "";
         dialogText.text = "";
@@ -85,8 +93,6 @@ public class VisualDialog : MonoBehaviour
         }
         else
         {
-            // Dialogs end
-            // Perform any necessary actions or close the dialog window
             if (AutoFinishDialog)
             {
                 SetChildStatus(ParentObject, false);
@@ -116,7 +122,6 @@ public class VisualDialog : MonoBehaviour
             nameText.text = player;
         }
 
-        //-- transfer dialog
         activeDialog = dialogData.dialog;
         string editedString = activeDialog;
         if (activeDialog.Contains("<name>"))
@@ -124,8 +129,8 @@ public class VisualDialog : MonoBehaviour
             editedString = EditString(activeDialog, "<name>", player);
         }
 
-        // Apply bold formatting
         editedString = ApplyBoldFormatting(editedString, dialogData.boldSentences);
+        activeDialog = editedString; // Update activeDialog with the formatted string
 
         if (typewriting)
         {
@@ -135,6 +140,7 @@ public class VisualDialog : MonoBehaviour
         {
             dialogText.text = editedString;
         }
+        isDialogRunning = true;
     }
 
     string ApplyBoldFormatting(string dialog, List<string> boldSentences)
@@ -154,6 +160,7 @@ public class VisualDialog : MonoBehaviour
             dialogText.text = currentText;
             yield return new WaitForSeconds(delay);
         }
+        typewriting = false;
     }
 
     string EditString(string originalString, string targetWord, string replacementWord)
@@ -174,13 +181,10 @@ public class VisualDialog : MonoBehaviour
 
     public void SetChildStatus(GameObject parentObject, bool aValue)
     {
-        // Mendapatkan semua komponen Transform dari anak-anak (children) objek
         Transform[] childTransforms = parentObject.GetComponentsInChildren<Transform>(true);
 
-        // Melakukan iterasi untuk menonaktifkan semua objek anak
         foreach (Transform childTransform in childTransforms)
         {
-            // Pastikan objek tersebut bukan parentObject itu sendiri
             if (childTransform.gameObject != parentObject)
             {
                 childTransform.gameObject.SetActive(aValue);
