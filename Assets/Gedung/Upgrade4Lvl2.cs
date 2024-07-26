@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class Upgrade4Lvl2 : MonoBehaviour
 {
+    [Header("Tag Object")]
+    public string TagObjt;
+
     [Header("Tombolnya")]
     public GameObject Tomboll;
     private GameObject level1;
@@ -52,6 +55,6 @@ public class Upgrade4Lvl2 : MonoBehaviour
 
     public void TemukanObject()
     {
-        level1 = GameObject.FindGameObjectWithTag("bangunan3lvl1");
+        level1 = GameObject.FindGameObjectWithTag(TagObjt);
     }
 }

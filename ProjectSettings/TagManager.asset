@@ -16,6 +16,8 @@ TagManager:
   - bangunan1lvl1
   - bangunan2lvl1
   - bangunan3lv1
+  - bangunan4lvl1
+  - bangunan5lvl1
   layers:
   - Default
   - TransparentFX

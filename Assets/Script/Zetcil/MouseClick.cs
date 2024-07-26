@@ -5,9 +5,6 @@ using UnityEngine.Events;
 
 public class MouseClick : MonoBehaviour
 {
-    [Header("Main Settings")]
-    public int MouseButton = 0; // This setting is not required anymore
-
     [Header("Event Settings")]
     public UnityEvent OnMouseDownEvent;
     public UnityEvent OnMouseUpEvent;
@@ -15,13 +12,12 @@ public class MouseClick : MonoBehaviour
     void OnMouseDown()
     {
         if (!this.enabled) return;
-        Vector3 mousePosition = Input.mousePosition;
         OnMouseDownEvent.Invoke();
     }
 
     void OnMouseUp()
     {
-        Vector3 mousePosition = Input.mousePosition;
+        if (!this.enabled) return;
         OnMouseUpEvent.Invoke();
     }
 
@@ -35,5 +31,4 @@ public class MouseClick : MonoBehaviour
     {
         this.enabled = true;
     }
-
 }

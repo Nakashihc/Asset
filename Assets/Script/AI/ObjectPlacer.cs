@@ -67,11 +67,9 @@ public class Objectplacer : MonoBehaviour
         if (xpSystem.Level <= 1)
         {
             levelTidakSampai.ShowUI();
-            Debug.Log("Level Tidak Cukup");
         }
         else if (upiahManager.totalUpiah <= Harga2)
         {
-            Debug.Log("Tidak Cukup Upiah");
             upiahTidakCukup.ShowUI();
         }
         else
@@ -89,12 +87,10 @@ public class Objectplacer : MonoBehaviour
     {
         if (xpSystem.Level <= 2)
         {
-            Debug.Log("Level Tidak Cukup");
             levelTidakSampai.ShowUI();
         }
         else if (upiahManager.totalUpiah <= Harga3)
         {
-            Debug.Log("Tidak Cukup Upiah");
             upiahTidakCukup.ShowUI();
         }
         else
@@ -111,12 +107,10 @@ public class Objectplacer : MonoBehaviour
     {
         if (xpSystem.Level <= 3)
         {
-            Debug.Log("Level Tidak Cukup");
             levelTidakSampai.ShowUI();
         }
         else if (upiahManager.totalUpiah <= Harga4)
         {
-            Debug.Log("Tidak Cukup Upiah");
             upiahTidakCukup.ShowUI();
         }
         else
@@ -133,12 +127,10 @@ public class Objectplacer : MonoBehaviour
     {
         if (xpSystem.Level <= 4)
         {
-            Debug.Log("Level Tidak Cukup");
             levelTidakSampai.ShowUI();
         }
         else if (upiahManager.totalUpiah <= Harga5)
         {
-            Debug.Log("Tidak Cukup Upiah");
             upiahTidakCukup.ShowUI();
         }
         else
@@ -155,12 +147,10 @@ public class Objectplacer : MonoBehaviour
     {
         if (xpSystem.Level <= 5)
         {
-            Debug.Log("Level Tidak Cukup");
             levelTidakSampai.ShowUI();
         }
         if (upiahManager.totalUpiah <= Harga6)
         {
-            Debug.Log("Tidak Cukup Upiah");
             upiahTidakCukup.ShowUI();
         }
         else
@@ -168,7 +158,7 @@ public class Objectplacer : MonoBehaviour
             upiahManager.UpiahKurang(Harga6);
             Instantiate(bangunan6, object2D.transform.position, Quaternion.identity);
             object2D.SetActive(false);
-            Upgrade5Lvl2.SetActive(true);
+            Upgrade6Lvl2.SetActive(true);
             BerhasilDibangun.ShowUI();
         }
     }
